@@ -1,12 +1,22 @@
 <script>
 	import favicon from '$lib/assets/favicon.svg';
 
-	let { children } = $props();
+	let { children, data } = $props();
 </script>
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
 </svelte:head>
+
+<header>
+	<p>Welcome {data.user?.username || 'Anonymus'}</p>
+	{#if data.user}
+	<form action="/logout?/logout" method="POST">
+		<button type="submit">Logout</button></form>
+	{:else}
+	<a href="/login">Login</a>
+	{/if}
+</header>
 
 {@render children()}
 <footer>
@@ -21,14 +31,19 @@
 </footer>
 
 <style>
-	footer{
+	footer {
 		display: flex;
 		justify-content: space-evenly;
 		padding: 20px;
 		background-color: pink;
 	}
-	a{
+	a {
 		text-decoration: none;
 	}
-	
+	header {
+		padding: 20px;
+		background-color: aqua;
+		display: flex;
+		justify-content: space-between;
+	}
 </style>

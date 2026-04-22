@@ -1,28 +1,28 @@
-import pool from '$lib/server/database.js'
-import { redirect } from '@sveltejs/kit'
+import pool from '$lib/server/database.js';
+import { redirect } from '@sveltejs/kit';
 
-export async function load(){
+export async function load({ locals }) {
+	if (!locals.user) redirect(303, '/login');
+	const [rows] = await pool.execute('SELECT * FROM Categories');
 
-    const [rows] = await pool.execute('SELECT * FROM Categories')
-
-    return{
-        Categories:rows
-    }
+	return {
+		Categories: rows
+	};
 }
 
+export const actions = {
+	create: async ({ request }) => {
+		const formData = await request.formData();
+		const name = formData.get('name');
+		const description = formData.get('description');
+		const startdate = formData.get('startdate');
+		const starttime = formData.get('starttime') + ':00';
+		const categoryId = formData.get('category');
 
-export const actions ={
-    create: async ({request}) => {
-        const formData = await request.formData();
-        const name = formData.get('name');
-        const description = formData.get('description');
-        const startdate = formData.get('startdate');
-        const starttime = formData.get('starttime') + ':00';
-        const categoryId = formData.get('category');
-
-        await pool.execute('INSERT INTO events (name, description, startdate, starttime, category_id) VALUES (?,?,?,?,?)',
-            [name,description,startdate,starttime, categoryId]
-        );
-        redirect(303, '/admin/events');
-    }
+		await pool.execute(
+			'INSERT INTO events (name, description, startdate, starttime, category_id) VALUES (?,?,?,?,?)',
+			[name, description, startdate, starttime, categoryId]
+		);
+		redirect(303, '/admin/events');
+	}
 };
